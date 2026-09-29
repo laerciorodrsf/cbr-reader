@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+require_relative "../lib/cbr_reader"
+
+path = ARGV.first
+
+abort "Uso: cbr-reader <arquivo.cbr>" unless path
+
+CbrReader.new(path).run
