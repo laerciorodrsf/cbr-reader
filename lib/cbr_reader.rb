@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'archive'
+require 'tty-reader'
 
 class CbrReader
   SUPPORTED_EXTENSIONS = %w[.cbr .cbz].freeze
@@ -18,13 +19,36 @@ class CbrReader
 
     abort 'No images found' unless pages
 
-    pages.each { |page| display_page(page) }
+    control_page(pages)
   end
 
   private
 
   def display_page(page)
     system('kitten', 'icat', page)
+  end
+
+  def control_page(pages)
+    current_page_idx = 0
+    last_page = pages.length - 1
+
+    reader = TTY::Reader.new
+
+    loop do
+      system('clear')
+      display_page(pages[current_page_idx])
+
+      key = reader.read_keypress
+
+      case key
+      when 'q'
+        break
+      when "\e[C"
+        current_page_idx += 1 if current_page_idx < last_page
+      when "\e[D"
+        current_page_idx -= 1 if current_page_idx > 0
+      end
+    end
   end
 
   def validate_file!
