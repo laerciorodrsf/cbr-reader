@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require_relative 'archive'
+require_relative 'terminal'
+
 require 'tty-reader'
 
 class CbrReader
@@ -25,7 +27,9 @@ class CbrReader
   private
 
   def display_page(page)
-    system('kitten', 'icat', page)
+    rows, columns = Terminal.size
+
+    system('kitten', 'icat', '--place', "#{columns}x#{rows}@0x0", page)
   end
 
   def control_page(pages)
@@ -46,7 +50,7 @@ class CbrReader
       when "\e[C"
         current_page_idx += 1 if current_page_idx < last_page
       when "\e[D"
-        current_page_idx -= 1 if current_page_idx > 0
+        current_page_idx -= 1 if current_page_idx.positive?
       end
     end
   end
