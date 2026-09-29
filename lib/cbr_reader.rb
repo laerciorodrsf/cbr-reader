@@ -18,12 +18,14 @@ class CbrReader
 
     abort 'No images found' unless pages
 
-    pages.each_with_index do |page, index|
-      puts "#{index + 1}: #{File.basename(page)}"
-    end
+    pages.each { |page| display_page(page) }
   end
 
   private
+
+  def display_page(page)
+    system('kitten', 'icat', page)
+  end
 
   def validate_file!
     abort "File not found: #{@path}" unless File.file?(@path)
